@@ -51,7 +51,7 @@ def main():
     nb_epochs = 1000
     # learning_rate = 0.01
     model = SimpleLSTM()
-    optimizer = optim.Adam(model.parameters(), lr=0.01)
+    optimizer = optim.Adam(model.parameters(), lr=0.002)
     loss_function = nn.MSELoss()
 
     print(model)
