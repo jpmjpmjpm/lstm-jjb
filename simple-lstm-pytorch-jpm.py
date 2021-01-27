@@ -43,13 +43,13 @@ def main():
     train_data_normalized = scaler.fit_transform(train_data.reshape(-1, 1))
 
     # Split the sequence by n_steps length slices and transform it to tensors
-    n_steps = 3
+    n_steps = 4
     train_data_normalized = FloatTensor(train_data_normalized).view(-1)
     train_inout_seq = create_inout_sequences(train_data_normalized, n_steps)
     print(f"Train in/out sequence: {train_inout_seq}")
 
     nb_epochs = 200
-    learning_rate = 0.002
+    learning_rate = 0.01
     model = SimpleLSTM()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     loss_function = nn.MSELoss()
@@ -75,7 +75,8 @@ def main():
         print(f'epoch: {nb_epochs:3} loss: {single_loss.item():10.10f}')
 
     model.eval()
-    test_x = np.array([340, 350, 360], dtype='float32')
+    test_x_list = [150 + 10 * i for i in range(n_steps)]
+    test_x = np.array(test_x_list, dtype='float32')
     test_x_normalized = scaler.transform(test_x.reshape(-1, 1))
     test_x_normalized = FloatTensor(test_x_normalized).view(-1)
 
@@ -84,9 +85,9 @@ def main():
                         zeros(1, 1, model.hidden_layer_size))
         test_y_normalized = model(test_x_normalized)
     test_y = test_y_normalized.numpy()
-    test_y = scaler.inverse_transform(test_y.reshape(-1,1))
+    test_y = scaler.inverse_transform(test_y.reshape(-1, 1))
 
-    print(f"Predicted value for [340, 350, 360] sample: {test_y[0][0]:.2f}")
+    print(f"Predicted value for {test_x_list} sample: {test_y[0][0]:.2f}")
 
 
 if __name__ == '__main__':
