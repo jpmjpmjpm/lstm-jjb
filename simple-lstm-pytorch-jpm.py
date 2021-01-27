@@ -1,7 +1,8 @@
 import numpy as np
-import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch import zeros, FloatTensor
+from sklearn.preprocessing import MinMaxScaler
 
 
 def create_inout_sequences(input_data, tw):
@@ -24,8 +25,8 @@ class SimpleLSTM(nn.Module):
         self.lstm = nn.LSTM(input_size, hidden_layer_size, nb_layers)
         self.linear = nn.Linear(hidden_layer_size, output_size)
 
-        self.hidden_cell = (torch.zeros(1, 1, self.hidden_layer_size),
-                            torch.zeros(1, 1, self.hidden_layer_size))
+        self.hidden_cell = (zeros(1, 1, self.hidden_layer_size),
+                            zeros(1, 1, self.hidden_layer_size))
 
     def forward(self, input_seq):
         lstm_out, self.hidden_cell = self.lstm(input_seq.view(len(input_seq), 1, -1), self.hidden_cell)
@@ -37,10 +38,14 @@ def main():
     # Define the sequence of points to be modeled
     train_data = np.linspace(10, 300, num=30, dtype='float32')
 
+    # Normalize the data
+    scaler = MinMaxScaler(feature_range=(-1, 1))
+    train_data_normalized = scaler.fit_transform(train_data.reshape(-1, 1))
+
     # Split the sequence by n_steps length slices and transform it to tensors
     n_steps = 3
-    train_data = torch.FloatTensor(train_data).view(-1)
-    train_inout_seq = create_inout_sequences(train_data, n_steps)
+    train_data_normalized = FloatTensor(train_data_normalized).view(-1)
+    train_inout_seq = create_inout_sequences(train_data_normalized, n_steps)
     print(f"Train in/out sequence: {train_inout_seq}")
 
     nb_epochs = 1000
@@ -54,8 +59,8 @@ def main():
     for i in range(nb_epochs):
         for seq, labels in train_inout_seq:
             optimizer.zero_grad()
-            model.hidden_cell = (torch.zeros(1, 1, model.hidden_layer_size),
-                                 torch.zeros(1, 1, model.hidden_layer_size))
+            model.hidden_cell = (zeros(1, 1, model.hidden_layer_size),
+                                 zeros(1, 1, model.hidden_layer_size))
 
             y_pred = model(seq)
 
