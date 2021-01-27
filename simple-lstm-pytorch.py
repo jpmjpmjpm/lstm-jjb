@@ -47,13 +47,19 @@ class SimpleLSTM(nn.Module):
 
 
 if __name__ == '__main__':
-    nb_epochs = 200
+
+    # Define the sequence of points to be modeled
     sequence = np.linspace(10, 300, num=30, dtype='float32')
+
+    # Split the sequence by n_steps length slices -> x, to predict y
     n_steps = 3
+    x, y = split_sequence(sequence, n_steps)
+    print(f"Train seq (numpy): {x}")
+    print(f"Train label (numpy): {y}")
+
+    nb_epochs = 200
     n_features = 1
     learning_rate = 0.01
-    x, y = split_sequence(sequence, n_steps)
-
     model = SimpleLSTM()
     print(model)
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
@@ -63,6 +69,8 @@ if __name__ == '__main__':
 
     x = x.reshape(-1, n_steps, n_features)
     y = y.reshape(-1, n_features)
+    print(f"Train seq (tensor): {x}")
+    print(f"Train label (tensor): {y}")
 
     for epoch in range(nb_epochs):
         optimizer.zero_grad()
