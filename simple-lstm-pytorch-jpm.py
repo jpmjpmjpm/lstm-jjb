@@ -1,8 +1,8 @@
 import numpy as np
 import torch.nn as nn
 import torch.optim as optim
-from torch import zeros, FloatTensor
 from sklearn.preprocessing import MinMaxScaler
+from torch import zeros, FloatTensor, no_grad
 
 
 def create_inout_sequences(input_data, tw):
@@ -38,7 +38,7 @@ def main():
     # Define the sequence of points to be modeled
     train_data = np.linspace(10, 300, num=30, dtype='float32')
 
-    # Normalize the data
+    # Normalize the data (list of lists with a single element)
     scaler = MinMaxScaler(feature_range=(-1, 1))
     train_data_normalized = scaler.fit_transform(train_data.reshape(-1, 1))
 
@@ -48,10 +48,10 @@ def main():
     train_inout_seq = create_inout_sequences(train_data_normalized, n_steps)
     print(f"Train in/out sequence: {train_inout_seq}")
 
-    nb_epochs = 1000
-    # learning_rate = 0.01
+    nb_epochs = 200
+    learning_rate = 0.002
     model = SimpleLSTM()
-    optimizer = optim.Adam(model.parameters(), lr=0.002)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     loss_function = nn.MSELoss()
 
     print(model)
@@ -73,6 +73,20 @@ def main():
 
     if single_loss is not None:
         print(f'epoch: {nb_epochs:3} loss: {single_loss.item():10.10f}')
+
+    model.eval()
+    test_x = np.array([340, 350, 360], dtype='float32')
+    test_x_normalized = scaler.transform(test_x.reshape(-1, 1))
+    test_x_normalized = FloatTensor(test_x_normalized).view(-1)
+
+    with no_grad():
+        model.hidden = (zeros(1, 1, model.hidden_layer_size),
+                        zeros(1, 1, model.hidden_layer_size))
+        test_y_normalized = model(test_x_normalized)
+    test_y = test_y_normalized.numpy()
+    test_y = scaler.inverse_transform(test_y.reshape(-1,1))
+
+    print(f"Predicted value for [340, 350, 360] sample: {test_y[0][0]:.2f}")
 
 
 if __name__ == '__main__':
