@@ -1,7 +1,8 @@
 import mxnet as mx
-import numpy as np
 import mxnet.gluon.nn as nn
 import mxnet.gluon.rnn as rnn
+import numpy as np
+from mxnet.autograd import record
 
 
 def split_sequence(sequence: np.array, n_steps: int) -> tuple:

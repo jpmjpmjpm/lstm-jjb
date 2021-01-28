@@ -10,6 +10,7 @@ gast==0.3.3
 google-auth==1.24.0
 google-auth-oauthlib==0.4.2
 google-pasta==0.2.0
+graphviz==0.8.4
 grpcio==1.32.0
 h5py==2.10.0
 idna==2.10
@@ -18,10 +19,10 @@ joblib==1.0.0
 Keras==2.4.3
 Keras-Preprocessing==1.1.2
 Markdown==3.3.3
+mxnet==1.7.0.post1
 numpy==1.19.5
 oauthlib==3.1.0
 opt-einsum==3.3.0
-pkg-resources==0.0.0
 protobuf==3.14.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
